@@ -1,0 +1,43 @@
+workflows:
+  architect-android:
+    name: Architect - Android APK
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      groups:
+        - firebase_config   # در Codemagic UI بساز و google-services.json را اینجا آپلود کن (env var فایل)
+    scripts:
+      - name: تولید ساختار پروژه اندروید (چون این ریپو بدون android/ ارسال شده)
+        script: |
+          if [ ! -d "android" ]; then
+            flutter create --platforms=android --org com.farzan .
+          fi
+
+      - name: جایگزینی فایل‌های gradle آماده‌شده با پشتیبانی Firebase
+        script: |
+          cp -f ci/android_build.gradle android/build.gradle
+          cp -f ci/android_app_build.gradle android/app/build.gradle
+
+      - name: قرار دادن google-services.json
+        script: |
+          # این فایل باید از Firebase Console دانلود و در Codemagic
+          # به عنوان یک Encrypted File در گروه firebase_config آپلود شده باشد
+          # با نام متغیر GOOGLE_SERVICES_JSON. اگر این مرحله را نمی‌شناسی،
+          # فایل را مستقیما در android/app/google-services.json در ریپو قرار بده (برای اپ شخصی مشکلی ندارد).
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+          fi
+
+      - name: نصب پکیج‌ها
+        script: flutter pub get
+
+      - name: بیلد APK ریلیز
+        script: flutter build apk --release
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+    publishing:
+      email:
+        recipients: []
