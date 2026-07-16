@@ -34,11 +34,7 @@ workflows:
 
       - name: رفع مشکل usage_stats برای Gradle جدید
         script: |
-          USAGE_GRADLE=$(find ~/.pub-cache/hosted/pub.dev -path "*usage_stats*/android/build.gradle" | head -1)
-          sed -i '' 's/jcenter()/mavenCentral()/g' "$USAGE_GRADLE"
-          sed -i '' '/android {/a\
-              namespace "com.example.usage_stats"
-          ' "$USAGE_GRADLE"
+          find ~/.pub-cache/hosted/pub.dev -path "*usage_stats*/android/build.gradle" -exec sed -i '' 's/jcenter()/mavenCentral()/g' {} \;
       - name: بیلد APK ریلیز
         script: flutter build apk --release
 
