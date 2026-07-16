@@ -32,9 +32,12 @@ workflows:
       - name: نصب پکیج‌ها
         script: flutter pub get
 
-      - name: رفع مشکل jcenter در usage_stats
+      - name: رفع مشکل usage_stats برای Gradle جدید
         script: |
           sed -i '' 's/jcenter()/mavenCentral()/g' ~/.pub-cache/hosted/pub.dev/usage_stats-*/android/build.gradle
+          sed -i '' '/android {/a\
+              namespace "com.example.usage_stats"
+          ' ~/.pub-cache/hosted/pub.dev/usage_stats-*/android/build.gradle
 
       - name: بیلد APK ریلیز
         script: flutter build apk --release
