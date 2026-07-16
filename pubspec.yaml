@@ -29,7 +29,7 @@ dependencies:
   timezone: ^0.9.4
 
   # --- Screen time tracking (Android Usage Stats) ---
-  usage_stats: 1.2.0
+  usage_stats: ^1.3.0
   
   # --- Networking / Utils ---
   http: ^1.2.2
